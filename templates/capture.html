@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhotoBooth - Capture</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📷 Capture Your Photos</h1>
+        <video id="video" autoplay></video>
+        <h2 id="countdown" class="countdown-timer"></h2>
+        <span id="counterText">0/3 Captured</span>
+        <div>
+            <button id="startBtn" class="start-btn">Start Capture</button>
+            <button id="proceedBtn" class="start-btn" style="display:none;" onclick="proceed()">Proceed</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

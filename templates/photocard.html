@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Photocard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Photocard</h1>
+        
+        <div class="photocard-container">
+            <!-- Photocard on the left -->
+            <div id="photocardWrapper">
+                <div id="photocard">
+                    <div class="photocard-inner">
+                        {% for photo in photos %}
+                            <img src="{{ photo }}" class="photo" />
+                        {% endfor %}
+                        <div class="photocard-border"></div>
+                    </div>
+                    <div class="photocard-info">
+                        <div id="photocard-date" class="photocard-date" style="display: none;">
+                            {{ current_date }}
+                        </div>
+                        <div class="photocard-logo">photobooth</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Customization options on the right -->
+            <div class="customize-section">
+                <h3 class="customize-title">Customize your photo</h3>
+                
+                <div class="option-group">
+                    <span class="option-label">Frame color:</span>
+                    <div class="color-options">
+                        <div class="color-option color-pink selected" data-color="#ffb6c1"></div>
+                        <div class="color-option color-blue" data-color="#add8e6"></div>
+                        <div class="color-option color-yellow" data-color="#fffacd"></div>
+                        <div class="color-option color-green" data-color="#9acd32"></div>
+                        <div class="color-option color-purple" data-color="#d8bfd8"></div>
+                        <div class="color-option color-beige" data-color="#deb887"></div>
+                        <div class="color-option color-red" data-color="#800000"></div>
+                        <div class="color-option color-white" data-color="#ffffff"></div>
+                        <div class="color-option color-black" data-color="#000000"></div>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <input type="checkbox" id="addDate" class="option-checkbox"> 
+                    <label for="addDate">Add date</label>
+                </div>
+                
+                <div class="option-row">
+                    <input type="checkbox" id="addGloss" class="option-checkbox"> 
+                    <label for="addGloss">Glossy finish</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button onclick="downloadPhotocard()" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download
+            </button>
+            <button onclick="location.href='/capture'" class="btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Retake Photos
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Initial setup
+        document.querySelector('.color-option.selected').click();
+        
+        // Select color options
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                document.querySelectorAll('.color-option').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                // Apply border color to photocard
+                const color = this.getAttribute('data-color');
+                document.querySelector('.photocard-border').style.borderColor = color;
+            });
+        });
+        
+        // Select background options
+        document.querySelectorAll('.bg-preview').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                document.querySelectorAll('.bg-preview').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                // Apply background image to photocard
+                const bgValue = this.getAttribute('data-bg');
+                if(bgValue === 'none') {
+                    document.getElementById('photocard').style.backgroundImage = 'none';
+                } else {
+                    document.getElementById('photocard').style.backgroundImage = `url('/static/bg/${bgValue}')`;
+                    document.getElementById('photocard').style.backgroundSize = 'cover';
+                }
+            });
+        });
+        
+        // Toggle date display
+        document.getElementById('addDate').addEventListener('change', function() {
+            document.getElementById('photocard-date').style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // Toggle glossy finish
+        document.getElementById('addGloss').addEventListener('change', function() {
+            if(this.checked) {
+                document.getElementById('photocard').style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1), inset 0 0 200px rgba(255, 255, 255, 0.3)';
+                document.getElementById('photocard').style.background = 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)';
+            } else {
+                document.getElementById('photocard').style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
+                document.getElementById('photocard').style.background = document.getElementById('photocard').style.backgroundImage ? document.getElementById('photocard').style.backgroundImage : 'white';
+            }
+        });
+        
+        function downloadPhotocard() {
+            // Apply temporary classes for better download appearance
+            const photocard = document.getElementById('photocard');
+            photocard.style.transform = 'none';
+            
+            html2canvas(photocard, {
+                scale: 2, // Higher quality
+                backgroundColor: null,
+                logging: false
+            }).then(canvas => {
+                let link = document.createElement("a");
+                link.download = "photocard-" + new Date().getTime() + ".png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                
+                // Reset the transform
+                setTimeout(() => {
+                    photocard.style.transform = '';
+                }, 100);
+            });
+        }
+    </script>
+</body>
+</html>

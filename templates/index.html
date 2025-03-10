@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhotoBooth</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-image: url('/static/images/bg1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    
+        <div class="logo-area">
+            <div class="est-year">
+                <span>SaKa</span>
+                <span>PhotoBooth</span>
+            </div>
+            <h1 class="logo-text">photobooth</h1>
+            <p class="tagline">Capture the moment, cherish the magic, relive the love</p>
+            
+            <div>
+                <a href="/capture" class="start-btn">Start </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            
+            <p>Shalaka Poojari & Sanjana Vichare.</p>
+        </div>
+    </div>
+</body>
+</html>
