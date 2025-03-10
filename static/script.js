@@ -2,8 +2,10 @@ const video = document.getElementById("video");
 const startBtn = document.getElementById("startBtn");
 const countdown = document.getElementById("countdown");
 const proceedBtn = document.getElementById("proceedBtn");
+const counterText = document.getElementById("counterText");
 
 let capturedPhotos = [];
+const totalPhotos = 3;
 
 navigator.mediaDevices.getUserMedia({ video: true })
     .then(stream => video.srcObject = stream)
@@ -11,18 +13,30 @@ navigator.mediaDevices.getUserMedia({ video: true })
 
 startBtn.addEventListener("click", async () => {
     startBtn.style.display = "none";
-    for (let i = 3; i > 0; i--) {
+
+    for (let i = 0; i < totalPhotos; i++) {
+        // Countdown before each capture
+        await runCountdown(3);
+        capturePhoto();
+        updateCaptureCounter(i + 1); // Update counter after capture
+    }
+
+    countdown.innerText = "";
+    proceedBtn.style.display = "inline-block";
+});
+
+// Dynamic countdown function
+async function runCountdown(seconds) {
+    for (let i = seconds; i > 0; i--) {
         countdown.innerText = i;
         await new Promise(res => setTimeout(res, 1000));
     }
-    for (let i = 0; i < 3; i++) {
-        await new Promise(res => setTimeout(res, 3000));
-        capturePhoto();
-    }
+    countdown.innerText = "📸 Smile!";
+    await new Promise(res => setTimeout(res, 1000)); // Hold message for a second
     countdown.innerText = "";
-    proceedBtn.style.display = "block";
-});
+}
 
+// Capture photo and store
 function capturePhoto() {
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -31,6 +45,12 @@ function capturePhoto() {
     capturedPhotos.push(canvas.toDataURL("image/png"));
 }
 
+// Update 1/3, 2/3, etc.
+function updateCaptureCounter(currentCount) {
+    counterText.innerText = `${currentCount}/${totalPhotos} Captured`;
+}
+
+// Proceed to next step
 function proceed() {
     fetch("/process", {
         method: "POST",
